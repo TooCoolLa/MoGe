@@ -20,6 +20,7 @@ import click
 @click.option('--version', 'model_version', type=click.Choice(['v1', 'v2']), default='v2', help='Model version. Defaults to "v2"')
 @click.option('--device', 'device_name', type=str, default='cuda', help='Device name (e.g. "cuda", "cuda:0", "cpu"). Defaults to "cuda"')
 @click.option('--fp16', 'use_fp16', is_flag=True, help='Use fp16 precision for faster inference.')
+@click.option('--raw', 'raw_output', is_flag=True, help='Output only the numerical distance value without any formatting.')
 def main(
     input_path: str,
     point1: str,
@@ -29,6 +30,7 @@ def main(
     model_version: str,
     device_name: str,
     use_fp16: bool,
+    raw_output: bool,
 ):  
     import cv2
     import numpy as np
@@ -95,11 +97,14 @@ def main(
     depth2 = depth[y2, x2]
 
     # Print results
-    print(f"Measurement Results:")
-    print(f"Image: {input_path}")
-    print(f"Point 1: ({x1}, {y1}) - Depth: {depth1:.2f}m")
-    print(f"Point 2: ({x2}, {y2}) - Depth: {depth2:.2f}m")
-    print(f"Distance between points: {distance:.2f}m")
+    if raw_output:
+        print(f"{distance:.2f}")
+    else:
+        print(f"Measurement Results:")
+        print(f"Image: {input_path}")
+        print(f"Point 1: ({x1}, {y1}) - Depth: {depth1:.2f}m")
+        print(f"Point 2: ({x2}, {y2}) - Depth: {depth2:.2f}m")
+        print(f"Distance between points: {distance:.2f}m")
 
     # Save results if output path is provided
     if output_path:
@@ -125,7 +130,9 @@ def main(
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
         cv2.imwrite(str(save_path / 'measurement_vis.jpg'), cv2.cvtColor(vis_image, cv2.COLOR_RGB2BGR))
         
-        print(f"Results saved to: {save_path}")
+        # Only print save path if not in raw output mode
+        if not raw_output:
+            print(f"Results saved to: {save_path}")
 
 
 if __name__ == '__main__':
