@@ -212,7 +212,7 @@ def main(share: bool, pretrained_model_name_or_path: str, model_version: str, us
         depth_text = ""
         for i, p in enumerate(measure_points):
             d = results['depth'][p[1], p[0]]
-            depth_text += f"- **P{i + 1} depth: {d:.2f}m.**\n"
+            depth_text += f"- **P{i + 1} depth: {d:.2f}m.** 像素坐标：{p[0]},{p[1]}\n"
 
         if len(measure_points) == 2:
             point1, point2 = measure_points
